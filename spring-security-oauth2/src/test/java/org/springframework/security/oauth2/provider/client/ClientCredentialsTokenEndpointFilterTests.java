@@ -48,14 +48,25 @@ public class ClientCredentialsTokenEndpointFilterTests {
 				new MockHttpServletResponse());
 	}
 
-	@Test
+    @Test(expected = BadCredentialsException.class)
+    public void testNoSecretAuthentication() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addParameter("client_id", "foo");
+        filter.setAuthenticationManager(authenticationManager);
+        filter.afterPropertiesSet();
+        filter.attemptAuthentication(request,
+                new MockHttpServletResponse());
+    }
+
+    @Test
 	public void testAuthentication() throws Exception {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		request.addParameter("client_id", "foo");
-		filter.setAuthenticationManager(authenticationManager);
+        request.addParameter("client_secret", "bar");
+        filter.setAuthenticationManager(authenticationManager);
 		filter.afterPropertiesSet();
 		Authentication authentication = new UsernamePasswordAuthenticationToken(
-				"foo", "",
+				"foo", "bar",
 				AuthorityUtils.commaSeparatedStringToAuthorityList("CLIENT"));
 		Mockito.when(
 				authenticationManager.authenticate(Mockito

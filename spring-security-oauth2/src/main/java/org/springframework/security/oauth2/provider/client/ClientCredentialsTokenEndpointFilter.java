@@ -108,12 +108,8 @@ public class ClientCredentialsTokenEndpointFilter extends AbstractAuthentication
 			return authentication;
 		}
 
-		if (clientId == null) {
+		if (clientId == null || clientSecret == null) {
 			throw new BadCredentialsException("No client credentials presented");
-		}
-
-		if (clientSecret == null) {
-			clientSecret = "";
 		}
 
 		clientId = clientId.trim();
@@ -150,12 +146,13 @@ public class ClientCredentialsTokenEndpointFilter extends AbstractAuthentication
 				uri = uri.substring(0, pathParamIndex);
 			}
 
-			String clientId = request.getParameter("client_id");
+            String clientId = request.getParameter("client_id");
+            String clientSecret = request.getParameter("client_secret");
 
-			if (clientId == null) {
-				// Give basic auth a chance to work instead (it's preferred anyway)
-				return false;
-			}
+            if (clientId == null || clientSecret == null) {
+                // Give basic auth a chance to work instead (it's preferred anyway)
+                return false;
+            }
 
 			if ("".equals(request.getContextPath())) {
 				return uri.endsWith(path);
